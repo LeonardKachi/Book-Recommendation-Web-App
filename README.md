@@ -1,6 +1,6 @@
 # 📚 Book Recommendation Web App
 
-An interactive book discovery platform powered by **Google Books API**, built using **HTML, CSS, and JavaScript**, and designed for deployment via **GitHub Pages** or **AWS Cloud Infrastructure** (S3, Lambda, API Gateway, Cognito, CloudWatch). The app lets users search, filter, and explore books by genres, ratings, and page count, all wrapped in a clean, theme-toggleable UI.
+An interactive book discovery platform powered by **Google Books API**, built using **HTML, CSS, and JavaScript**, and designed for deployment via **GitHub Pages**, **Terraform with AWS Cloud Infrastructure**, or **S3**. The app lets users search, filter, and explore books by genres, ratings, and page count, all wrapped in a clean, theme-toggleable UI.
 
 ## 🔧 Architecture Overview
 
@@ -11,8 +11,9 @@ An interactive book discovery platform powered by **Google Books API**, built us
 - **Frontend:** HTML, CSS, JavaScript (deployable on **GitHub Pages** or **Amazon S3**)
 - **Authentication (Optional):** **Amazon Cognito** (user pool)
 - **Backend:** **AWS Lambda** function (Node.js handler)
-- **API Management:** **Amazon API Gateway** (REST API)
+- **API Management:** **Amazon API Gateway** (HTTP API)
 - **Logging & Monitoring:** **Amazon CloudWatch**
+- **Infrastructure as Code:** **Terraform**
 - **Book Data Source:** **Google Books API**
 
 ---
@@ -22,59 +23,63 @@ An interactive book discovery platform powered by **Google Books API**, built us
 ### 📁 1. Folder Structure
 
 ```
+.
 ├── index.html
 ├── app.js
 ├── lambda/
 │   └── lambda_function.zip  # Your zipped Lambda handler
+├── main.tf                  # Terraform script for infrastructure
+
 ```
 
 ---
 
-### 2. Setup Options
+### 2. Deployment Options
 
-#### 📲 A. Deploy via GitHub Pages
+#### 📲 A. GitHub Pages (Frontend Only)
 1. Push your project to a GitHub repository.
-2. Go to your repository settings.
-3. Scroll to **Pages**.
-4. Under "Source", choose `main` branch and `/ (root)`.
-5. Save and wait a few minutes.
-6. Your site will be live at: `https://<username>.github.io/<repository-name>/`
+2. Go to your repository settings > **Pages**.
+3. Set source to `main` branch and `/ (root)`.
+4. Wait for a few minutes.
+5. Access it at: `https://<username>.github.io/<repository-name>/`
 
-Make sure:
-- `index.html` and `app.js` are in the root of the repo.
-- The `API_ENDPOINT` in `app.js` is correct and publicly accessible.
+Update the `API_ENDPOINT` in `app.js` to point to your deployed API Gateway URL.
 
-#### 🗂️ B. Deploy Frontend to S3 (Optional)
-1. Create an S3 bucket and enable **Static Website Hosting**.
-2. Upload:
-   - `index.html`
-   - `app.js`
-3. Set permissions for public read access (or use CloudFront).
-4. Update the `API_ENDPOINT` in `app.js`.
+#### ⚙️ B. Terraform Deployment (Full Stack)
+Use the provided `main.tf` file to set up your infrastructure.
 
-#### ⚙️ C. Set Up AWS Lambda
-1. Go to **AWS Lambda**, create a function.
-2. Upload `lambda_function.zip`.
-3. Set handler (`index.handler`) and runtime (`Node.js`).
-4. Grant permissions for Internet and CloudWatch.
+1. Ensure you have **Terraform** and **AWS CLI** configured.
+2. Run the following commands:
+   ```bash
+   terraform init
+   terraform apply
+   ```
+3. This will automatically:
+   - Deploy a public S3 bucket for static hosting
+   - Deploy the Lambda backend
+   - Configure API Gateway
+   - Create IAM roles and permissions
+4. Outputs will include:
+   - `website_url`: S3 hosted frontend
+   - `api_url`: API Gateway endpoint
 
-#### 🌐 D. Configure REST API Gateway
-1. Create REST API.
-2. Add `/recommendations` endpoint with `GET` method.
-3. Link to your Lambda function.
-4. Enable CORS.
-5. Deploy and get the public endpoint.
+Update `API_ENDPOINT` in `app.js` with the output `api_url`.
 
-#### 🧐 E. Add Cognito Auth (Optional)
-- Create a User Pool.
-- Set up Cognito Authorizer in API Gateway.
-- Protect endpoints.
+#### 🌐 C. Manual S3 Deployment (Frontend Only)
+1. Create an S3 bucket, enable **Static Website Hosting**.
+2. Upload `index.html` and `app.js`.
+3. Set permissions for public read access.
+4. Link the frontend to your API Gateway.
+
+#### 🧐 D. Cognito (Optional for Auth)
+- Set up a Cognito User Pool.
+- Use API Gateway authorizers to protect endpoints.
 
 ---
 
 ## 🌍 Live Demo
 
-You can deploy this app on **GitHub Pages** at no cost, or use **AWS services** for more control and scalability.
+Host this project on **GitHub Pages** for frontend only, or use **Terraform on AWS** for full infrastructure provisioning.
 
 ---
 
@@ -106,12 +111,12 @@ Returns a list of books recommended from the Google Books API.
 
 ---
 
-## 🛡 Security Considerations
+## Security Considerations
 
-- For AWS deployments, isolate API access via **API Gateway**.
-- Use **Cognito** for secure user sessions.
-- Monitor usage via **CloudWatch**.
-- Use **least privilege** on IAM roles.
+- API access is secured via **API Gateway**.
+- Optional **Cognito** integration for user authentication.
+- Logs are collected via **CloudWatch**.
+- IAM roles follow **least privilege** principles.
 
 ---
 
@@ -126,5 +131,3 @@ Cloud Security Architect | DevSecOps Engineer
 ## 📜 License
 
 MIT — feel free to fork and improve!
-
-
