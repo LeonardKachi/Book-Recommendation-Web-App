@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommender Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-light: #4361ee;
+            --secondary-light: #3a0ca3;
+            --background-light: #f8f9fa;
+            --text-light: #212529;
+            --card-light: #ffffff;
+            --border-light: #dee2e6;
+            
+            --primary-dark: #2e7d32;
+            --secondary-dark: #1b5e20;
+            --background-dark: #121212;
+            --text-dark: #e0e0e0;
+            --card-dark: #1e1e1e;
+            --border-dark: #333;
+            
+            --primary: var(--primary-light);
+            --secondary: var(--secondary-light);
+            --background: var(--background-light);
+            --text: var(--text-light);
+            --card: var(--card-light);
+            --border: var(--border-light);
+            
+            --rating-color: #ffc107;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+        }
+        
+        [data-theme="dark"] {
+            --primary: var(--primary-dark);
+            --secondary: var(--secondary-dark);
+            --background: var(--background-dark);
+            --text: var(--text-dark);
+            --card: var(--card-dark);
+            --border: var(--border-dark);
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background);
+            color: var(--text);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            position: relative;
+        }
+        
+        h1 {
+            margin: 0;
+            font-weight: 500;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            margin: 10px 0 0;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+        
+        .search-container {
+            flex-grow: 1;
+            display: flex;
+            min-width: 300px;
+        }
+        
+        input, button, select {
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 16px;
+            background-color: var(--card);
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        
+        input {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-1px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .genre-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .genre-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            background-color: var(--card);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .genre-btn:hover {
+            background-color: rgba(var(--primary-rgb), 0.1);
+        }
+        
+        .genre-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .book-card {
+            background: var(--card);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border);
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .book-cover-container {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+        }
+        
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .book-card:hover .book-cover {
+            transform: scale(1.05);
+        }
+        
+        .book-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .book-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .book-title {
+            font-weight: 500;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+        
+        .book-author {
+            color: var(--text);
+            opacity: 0.8;
+            margin: 0 0 15px 0;
+            font-size: 14px;
+        }
+        
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .book-rating {
+            color: var(--rating-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .book-pages {
+            opacity: 0.7;
+        }
+        
+        .book-description {
+            font-size: 14px;
+            margin: 0 0 20px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex-grow: 1;
+            line-height: 1.5;
+        }
+        
+        .book-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .book-price {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        .book-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .book-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 15px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .book-link:hover {
+            background-color: var(--secondary);
+            text-decoration: none;
+        }
+        
+        .book-link.secondary {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .book-link.secondary:hover {
+            background-color: rgba(var(--primary-rgb), 0.1);
+        }
+        
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            grid-column: 1 / -1;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(var(--primary-rgb), 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            padding: 20px;
+            background: rgba(220, 53, 69, 0.1);
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .no-results-icon {
+            font-size: 50px;
+            opacity: 0.5;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            grid-column: 1 / -1;
+        }
+        
+        .pagination button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .pagination button.active {
+            background-color: var(--secondary);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        @media (max-width: 992px) {
+            .book-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                min-width: auto;
+            }
+            
+            .filters {
+                width: 100%;
+            }
+            
+            .filter-group {
+                flex-grow: 1;
+            }
+            
+            select {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .book-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .book-cover-container {
+                height: 300px;
+            }
+            
+            .genre-buttons {
+                justify-content: center;
+            }
+            
+            header {
+                padding: 20px 0;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+            <h1>Book Recommender</h1>
+            <p class="subtitle">Discover your next favorite read</p>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="controls">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by title, author, or keyword">
+                <button id="searchBtn">
+                    <i class="fas fa-search"></i>
+                    <span class="search-text">Search</span>
+                </button>
+            </div>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="sortSelect">Sort by</label>
+                    <select id="sortSelect">
+                        <option value="relevance">Relevance</option>
+                        <option value="rating">Rating</option>
+                        <option value="newest">Newest</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="pageCountFilter">Pages</label>
+                    <select id="pageCountFilter">
+                        <option value="any">Any Length</option>
+                        <option value="short">Short (<300)</option>
+                        <option value="medium">Medium (300-600)</option>
+                        <option value="long">Long (600+)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="genre-buttons" id="genreButtons">
+            <button class="genre-btn active" data-genre="all">All Genres</button>
+            <button class="genre-btn" data-genre="fiction">Fiction</button>
+            <button class="genre-btn" data-genre="science">Science</button>
+            <button class="genre-btn" data-genre="fantasy">Fantasy</button>
+            <button class="genre-btn" data-genre="mystery">Mystery</button>
+            <button class="genre-btn" data-genre="romance">Romance</button>
+            <button class="genre-btn" data-genre="biography">Biography</button>
+            <button class="genre-btn" data-genre="history">History</button>
+        </div>
+        
+        <div class="book-grid" id="bookGrid">
+            <div class="loading-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading books...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pagination" id="pagination"></div>
+        
+        <div class="toast" id="toast"></div>
+    </main>
+    <footer style="text-align: center; font-size: 14px; color: #666; margin-top: 40px; padding: 20px 0; border-top: 1px solid #ccc;">
+        <p>
+          &copy; 2025 Obidiegwu Onyedikachi Henry Leonard &nbsp;|&nbsp; 
+          Cloud Security Architect • CISO • DevSecOps Engineer • Cloud Engineer • Software Engineer
+        </p>
+        <p>
+          Portfolio: <a href="https://leonardkachi.github.io/Portfolio-website" target="_blank">leonardkachi.github.io/Portfolio-website</a> &nbsp;|&nbsp;
+          Email: <a href="mailto:Henryleo480@gmail.com">Henryleo480@gmail.com.com</a> &nbsp;|&nbsp;
+          Tel: <a href="tel:+2348142795186">+2348142795186</a>
+        </p>
+      </footer>
+      
+    <script src="app.js"></script>
+</body>
+</html>
