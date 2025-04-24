@@ -1,6 +1,6 @@
 # 📚 Book Recommendation Web App
 
-An interactive book discovery platform powered by **Google Books API**, deployed using **AWS Cloud Infrastructure** (S3, Lambda, API Gateway, Cognito, CloudWatch). The app lets users search, filter, and explore books by genres, ratings, and page count, all wrapped in a clean, theme-toggleable UI.
+An interactive book discovery platform powered by **Google Books API**, built using **HTML, CSS, and JavaScript**, and designed for deployment via **GitHub Pages** or **AWS Cloud Infrastructure** (S3, Lambda, API Gateway, Cognito, CloudWatch). The app lets users search, filter, and explore books by genres, ratings, and page count, all wrapped in a clean, theme-toggleable UI.
 
 ## 🔧 Architecture Overview
 
@@ -8,8 +8,8 @@ An interactive book discovery platform powered by **Google Books API**, deployed
 
 ### 🔹 Tech Stack
 
-- **Frontend:** HTML, CSS, JavaScript (static hosted on **Amazon S3**)
-- **Authentication:** **Amazon Cognito** (user pool)
+- **Frontend:** HTML, CSS, JavaScript (deployable on **GitHub Pages** or **Amazon S3**)
+- **Authentication (Optional):** **Amazon Cognito** (user pool)
 - **Backend:** **AWS Lambda** function (Node.js handler)
 - **API Management:** **Amazon API Gateway** (REST API)
 - **Logging & Monitoring:** **Amazon CloudWatch**
@@ -22,59 +22,59 @@ An interactive book discovery platform powered by **Google Books API**, deployed
 ### 📁 1. Folder Structure
 
 ```
-.
 ├── index.html
 ├── app.js
 ├── lambda/
 │   └── lambda_function.zip  # Your zipped Lambda handler
-├── Book-recommendation-app.drawio.png
-└── README.md
 ```
 
 ---
 
-### ✅ 2. Setup Steps
+### 2. Setup Options
 
-#### 🔐 A. Create a Cognito User Pool
-1. Go to **Amazon Cognito**.
-2. Create a **User Pool** (for user authentication).
-3. Enable **email-based signup/login**.
-4. Note down the **User Pool ID** and **App Client ID**.
+#### 📲 A. Deploy via GitHub Pages
+1. Push your project to a GitHub repository.
+2. Go to your repository settings.
+3. Scroll to **Pages**.
+4. Under "Source", choose `main` branch and `/ (root)`.
+5. Save and wait a few minutes.
+6. Your site will be live at: `https://<username>.github.io/<repository-name>/`
 
-#### 🗂️ B. Deploy Frontend to S3
-1. Go to **Amazon S3** and create a new bucket.
-2. Enable **Static Website Hosting**.
-3. Upload:
+Make sure:
+- `index.html` and `app.js` are in the root of the repo.
+- The `API_ENDPOINT` in `app.js` is correct and publicly accessible.
+
+#### 🗂️ B. Deploy Frontend to S3 (Optional)
+1. Create an S3 bucket and enable **Static Website Hosting**.
+2. Upload:
    - `index.html`
    - `app.js`
-4. Set permissions:
-   - Make objects **publicly readable** (or use CloudFront + signed URLs).
-5. Update the **API endpoint URL** in `app.js` if it differs.
+3. Set permissions for public read access (or use CloudFront).
+4. Update the `API_ENDPOINT` in `app.js`.
 
-#### ⚙️ C. Set Up Lambda
-1. Go to **AWS Lambda**, create a new function.
-2. Choose "Author from scratch", runtime: **Node.js**.
-3. Upload the zipped **`lambda_function.zip`**.
-4. Set handler name (`index.handler` if your file is named `index.js` inside).
-5. Grant permission to access the **Google Books API** (via Internet), and log to **CloudWatch**.
+#### ⚙️ C. Set Up AWS Lambda
+1. Go to **AWS Lambda**, create a function.
+2. Upload `lambda_function.zip`.
+3. Set handler (`index.handler`) and runtime (`Node.js`).
+4. Grant permissions for Internet and CloudWatch.
 
-#### 🌐 D. Create REST API Gateway
-1. Go to **API Gateway**, create a new REST API.
-2. Set up a `/recommendations` resource and a `GET` method.
-3. Link the method to your Lambda function.
-4. Enable **CORS**.
-5. Deploy the API to a new stage (e.g., `prod`) and copy the endpoint URL.
+#### 🌐 D. Configure REST API Gateway
+1. Create REST API.
+2. Add `/recommendations` endpoint with `GET` method.
+3. Link to your Lambda function.
+4. Enable CORS.
+5. Deploy and get the public endpoint.
 
-#### 🧐 E. Integrate Cognito Authentication
-(Optional for now – for securing API access):
-- Configure API Gateway to use Cognito **Authorizer** with the User Pool.
-- Protect your `/recommendations` endpoint.
+#### 🧐 E. Add Cognito Auth (Optional)
+- Create a User Pool.
+- Set up Cognito Authorizer in API Gateway.
+- Protect endpoints.
 
 ---
 
 ## 🌍 Live Demo
 
-You can host this project on an **S3 public endpoint**, or connect a custom domain using **Amazon Route 53**.
+You can deploy this app on **GitHub Pages** at no cost, or use **AWS services** for more control and scalability.
 
 ---
 
@@ -82,7 +82,7 @@ You can host this project on an **S3 public endpoint**, or connect a custom doma
 
 ### `GET /recommendations`
 
-**Returns**: A list of recommended books queried from the Google Books API.
+Returns a list of books recommended from the Google Books API.
 
 ```json
 {
@@ -106,12 +106,12 @@ You can host this project on an **S3 public endpoint**, or connect a custom doma
 
 ---
 
-## 🛡️ Security Considerations
+## 🛡 Security Considerations
 
-- API access is isolated via **API Gateway**.
-- Cognito is planned for authenticated user sessions.
-- CloudWatch handles centralized logging for Lambda invocations.
-- Ensure IAM roles **follow least privilege** best practices.
+- For AWS deployments, isolate API access via **API Gateway**.
+- Use **Cognito** for secure user sessions.
+- Monitor usage via **CloudWatch**.
+- Use **least privilege** on IAM roles.
 
 ---
 
@@ -126,4 +126,5 @@ Cloud Security Architect | DevSecOps Engineer
 ## 📜 License
 
 MIT — feel free to fork and improve!
+
 
