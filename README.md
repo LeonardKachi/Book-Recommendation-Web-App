@@ -1,6 +1,6 @@
 # 📚 Book Recommendation Web App
 
-An interactive book discovery platform powered by **Google Books API**, built using **HTML, CSS, and JavaScript**, and designed for deployment via **GitHub Pages**, **Terraform with AWS Cloud Infrastructure**, or **S3**. The app lets users search, filter, and explore books by genres, ratings, and page count, all wrapped in a clean, theme-toggleable UI.
+An interactive book discovery platform powered by **Google Books API**, built using **HTML, CSS, and JavaScript**, and deployable via **GitHub Pages** or **fully automated Terraform-based AWS Infrastructure**. Users can explore, search, and filter book recommendations with a smooth UI and serverless backend.
 
 ## 🔧 Architecture Overview
 
@@ -8,78 +8,66 @@ An interactive book discovery platform powered by **Google Books API**, built us
 
 ### 🔹 Tech Stack
 
-- **Frontend:** HTML, CSS, JavaScript (deployable on **GitHub Pages** or **Amazon S3**)
-- **Authentication (Optional):** **Amazon Cognito** (user pool)
-- **Backend:** **AWS Lambda** function (Node.js handler)
-- **API Management:** **Amazon API Gateway** (HTTP API)
-- **Logging & Monitoring:** **Amazon CloudWatch**
-- **Infrastructure as Code:** **Terraform**
-- **Book Data Source:** **Google Books API**
+- **Frontend:** HTML, CSS, JavaScript (S3 or GitHub Pages)
+- **Backend:** AWS Lambda (Node.js), API Gateway (HTTP API)
+- **Infra as Code:** Terraform
+- **Authentication (Optional):** Amazon Cognito
+- **Monitoring:** Amazon CloudWatch
+- **State Management:** S3 + DynamoDB backend
+- **Book Data Source:** Google Books API
 
 ---
 
 ## 🚀 Deployment Instructions
 
-### 📁 1. Folder Structure
+### 📁 1. Project Structure
 
 ```
 .
 ├── index.html
 ├── app.js
 ├── lambda/
-│   └── lambda_function.zip  # Your zipped Lambda handler
-├── main.tf                  # Terraform script for infrastructure
-
+│   └── lambda_function.zip
+├── terraform/
+│   ├── main.tf
+|   ├── variables.tf
+|   ├── outputs.tf
+|   ├── backend.tf
+└── README.md
 ```
 
 ---
 
-### 2. Deployment Options
+### ✅ 2. Deployment Options
 
 #### 📲 A. GitHub Pages (Frontend Only)
-1. Push your project to a GitHub repository.
-2. Go to your repository settings > **Pages**.
-3. Set source to `main` branch and `/ (root)`.
-4. Wait for a few minutes.
-5. Access it at: `https://<username>.github.io/<repository-name>/`
+1. Push to a GitHub repository.
+2. Go to Settings > Pages, set source to `main` and root folder.
+3. App will be live at `https://<username>.github.io/<repo>/`
+4. Ensure `API_ENDPOINT` in `app.js` points to your live API URL.
 
-Update the `API_ENDPOINT` in `app.js` to point to your deployed API Gateway URL.
-
-#### ⚙️ B. Terraform Deployment (Full Stack)
-Use the provided `main.tf` file to set up your infrastructure.
-
-1. Ensure you have **Terraform** and **AWS CLI** configured.
-2. Run the following commands:
+#### ⚙️ B. Full Stack Deployment with Terraform (Recommended)
+1. Install [Terraform](https://terraform.io) and [AWS CLI](https://aws.amazon.com/cli/).
+2. Configure AWS CLI with `aws configure`
+3. Create:
+   - S3 bucket for Terraform state
+   - DynamoDB table `terraform-locks` with `LockID` as primary key
+4. Run the following:
    ```bash
    terraform init
-   terraform apply
+   terraform apply -var="frontend_bucket_name=your-unique-bucket-name"
    ```
-3. This will automatically:
-   - Deploy a public S3 bucket for static hosting
-   - Deploy the Lambda backend
-   - Configure API Gateway
-   - Create IAM roles and permissions
-4. Outputs will include:
-   - `website_url`: S3 hosted frontend
-   - `api_url`: API Gateway endpoint
-
-Update `API_ENDPOINT` in `app.js` with the output `api_url`.
-
-#### 🌐 C. Manual S3 Deployment (Frontend Only)
-1. Create an S3 bucket, enable **Static Website Hosting**.
-2. Upload `index.html` and `app.js`.
-3. Set permissions for public read access.
-4. Link the frontend to your API Gateway.
-
-#### 🧐 D. Cognito (Optional for Auth)
-- Set up a Cognito User Pool.
-- Use API Gateway authorizers to protect endpoints.
+5. Outputs:
+   - `website_url`: Public S3 frontend URL
+   - `api_url`: API Gateway URL to use in `app.js`
 
 ---
 
-## 🌍 Live Demo
+## 🌐 Live Demo
 
-Host this project on **GitHub Pages** for frontend only, or use **Terraform on AWS** for full infrastructure provisioning.
+Deploy via:
+- 🔗 GitHub Pages (for frontend-only showcase)
+- ☁️ AWS Infrastructure via Terraform for complete functionality
 
 ---
 
@@ -87,7 +75,7 @@ Host this project on **GitHub Pages** for frontend only, or use **Terraform on A
 
 ### `GET /recommendations`
 
-Returns a list of books recommended from the Google Books API.
+Returns a list of book recommendations from Google Books API.
 
 ```json
 {
@@ -103,20 +91,19 @@ Returns a list of books recommended from the Google Books API.
       "image": "https://...",
       "purchaseLink": "https://...",
       "price": "$30.99"
-    },
-    ...
+    }
   ]
 }
 ```
 
 ---
 
-## Security Considerations
+## 🛡️ Security & Infrastructure Notes
 
-- API access is secured via **API Gateway**.
-- Optional **Cognito** integration for user authentication.
-- Logs are collected via **CloudWatch**.
-- IAM roles follow **least privilege** principles.
+- Backend is secured via **API Gateway + IAM roles**
+- Optional **Cognito** integration for user auth
+- **Terraform backend** state stored in S3 and locked via DynamoDB
+- CloudWatch is enabled for Lambda logging
 
 ---
 
@@ -130,4 +117,4 @@ Cloud Security Architect | DevSecOps Engineer
 
 ## 📜 License
 
-MIT — feel free to fork and improve!
+MIT — fork it, learn from it, build on it ✨
