@@ -47,7 +47,7 @@ An interactive book discovery platform powered by **Google Books API**, built us
 4. Ensure `API_ENDPOINT` in `app.js` points to your live API URL.
 
 #### ⚙️ B. Full Stack Deployment with Terraform (Recommended)
-1. Install [Terraform](https://terraform.io) and [AWS CLI](https://aws.amazon.com/cli/).
+1. Install [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) and [AWS CLI](https://aws.amazon.com/cli/).
 2. Configure AWS CLI with `aws configure`
 3. Create:
    - S3 bucket for Terraform state
