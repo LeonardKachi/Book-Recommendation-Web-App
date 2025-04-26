@@ -218,7 +218,47 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return stars + ` <span>(${rating.toFixed(1)})</span>`;
     }
-    
+   
+        showPage(currentPage);
+        updatePagination();
+    }
+
+    function showPage(page) {
+        const start = (page - 1) * booksPerPage;
+        const end = start + booksPerPage;
+        const currentBooks = filteredBooks.slice(start, end);
+
+        bookGrid.innerHTML = currentBooks.map(book => `
+            <div class="book-card">
+                <img src="${book.image}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover'"/>
+                <h3>${book.title}</h3>
+                <p>By ${book.author}</p>
+                <p>${book.description}</p>
+                ${book.price ? `<p class="book-price">${book.price}</p>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
+        pagination.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.textContent = i;
+            if (i === currentPage) btn.classList.add('active');
+            btn.onclick = () => {
+                currentPage = i;
+                showPage(i);
+            };
+            pagination.appendChild(btn);
+        }
+    }
+
+    fetchBooks(); // initial call
+}); 
     function showError(message) {
         bookGrid.innerHTML = `
             <div class="error-message">
