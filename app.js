@@ -18,7 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentGenre = 'all';
     let currentSearchQuery = '';
     let currentPage = 1;
+    let totalBooks = 0;
     const booksPerPage = 12;
+    const maxVisiblePages = 7; // Adjust this to show more/fewer page buttons
     
     // Initialize
     initTheme();
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.target.classList.add('active');
                 currentGenre = e.target.dataset.genre;
                 currentPage = 1;
-                applyFilters();
+                fetchBooks();
             }
         });
     }
@@ -85,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!data.books || data.books.length === 0) throw new Error('No books found');
             
             allBooks = processBooks(data.books);
+            totalBooks = data.totalItems || data.books.length;
             applyFilters();
             showToast('Books loaded successfully!');
         } catch (error) {
@@ -214,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updatePagination() {
-        const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
+        const totalPages = Math.ceil(totalBooks / booksPerPage);
         
         if (totalPages <= 1) {
             paginationContainer.innerHTML = '';
@@ -231,33 +234,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 <div class="page-numbers">`;
         
-        // Always show first page
-        if (currentPage > 1) {
+        // Calculate range of pages to show
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        // Adjust if we're at the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        // Always show first page if not in range
+        if (startPage > 1) {
             paginationHTML += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+            if (startPage > 2) {
+                paginationHTML += `<span class="page-dots">...</span>`;
+            }
         }
         
-        // Show pages around current page
-        const startPage = Math.max(2, currentPage - 2);
-        const endPage = Math.min(totalPages - 1, currentPage + 2);
-        
-        // Show ellipsis if needed before middle pages
-        if (startPage > 2) {
-            paginationHTML += `<span class="page-dots">...</span>`;
-        }
-        
-        // Show middle pages
+        // Show page buttons
         for (let i = startPage; i <= endPage; i++) {
-            paginationHTML += `<button class="page-btn ${currentPage === i ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            paginationHTML += `
+                <button class="page-btn ${currentPage === i ? 'active' : ''}" 
+                        onclick="changePage(${i})">
+                    ${i}
+                </button>`;
         }
         
-        // Show ellipsis if needed after middle pages
-        if (endPage < totalPages - 1) {
-            paginationHTML += `<span class="page-dots">...</span>`;
-        }
-        
-        // Always show last page if there's more than one page
-        if (totalPages > 1) {
-            paginationHTML += `<button class="page-btn ${currentPage === totalPages ? 'active' : ''}" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        // Always show last page if not in range
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHTML += `<span class="page-dots">...</span>`;
+            }
+            paginationHTML += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
         }
         
         paginationHTML += `
@@ -276,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.changePage = function(newPage) {
         currentPage = newPage;
-        applyFilters();
+        fetchBooks();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     
@@ -304,6 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `;
+        paginationContainer.innerHTML = '';
     }
     
     function showError(message) {
@@ -313,6 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p>${message}</p>
             </div>
         `;
+        paginationContainer.innerHTML = '';
     }
     
     function showToast(message) {
