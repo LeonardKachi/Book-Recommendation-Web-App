@@ -107,10 +107,16 @@ document.addEventListener('DOMContentLoaded', function() {
             rating: parseFloat(book.rating) || 0,
             pageCount: parseInt(book.pageCount) || 0,
             publishedDate: book.publishedDate || '',
-            purchaseLink: book.purchaseLink || '#',
+            purchaseLink: book.purchaseLink || generatePurchaseLink(book),
             price: book.price ? `$${parseFloat(book.price).toFixed(2)}` : 'Not available',
             popularity: parseFloat(book.popularity) || 0
         }));
+    }
+    
+    function generatePurchaseLink(book) {
+        if (book.purchaseLink) return book.purchaseLink;
+        // Fallback purchase links
+        return `https://www.amazon.com/s?k=${encodeURIComponent(book.title + ' ' + (book.author || ''))}`;
     }
     
     function applyFilters() {
