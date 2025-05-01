@@ -9,7 +9,7 @@ An interactive book discovery platform powered by **Google Books API**, built us
 ### 🔹 Tech Stack
 
 - **Frontend:** HTML, CSS, JavaScript (S3 or GitHub Pages)
-- **Backend:** AWS Lambda (Node.js), API Gateway (HTTP API)
+- **Backend:** AWS Lambda (Python), API Gateway (REST API)
 - **Infra as Code:** Terraform
 - **Authentication (Optional):** Amazon Cognito
 - **Monitoring:** Amazon CloudWatch
@@ -64,7 +64,7 @@ An interactive book discovery platform powered by **Google Books API**, built us
 ---
 
 ## 🌐 Live Demo
-
+[Next Read](https://leonardkachi.github.io/Next-Read/)
 Deploy via:
 - 🔗 GitHub Pages (for frontend-only showcase)
 - ☁️ AWS Infrastructure via Terraform for complete functionality
@@ -98,7 +98,7 @@ Returns a list of book recommendations from Google Books API.
 
 ---
 
-## 🛡️ Security & Infrastructure Notes
+## Security & Infrastructure Notes
 
 - Backend is secured via **API Gateway + IAM roles**
 - Optional **Cognito** integration for user auth
