@@ -64,7 +64,7 @@ An interactive book discovery platform powered by **Google Books API**, built us
 ---
 
 ## 🌐 Live Demo
-[Next Read](https://leonardkachi.github.io/Next-Read/)
+[Next Read](https://leonardkachi.github.io/Next-Read/)  
 Deploy via:
 - 🔗 GitHub Pages (for frontend-only showcase)
 - ☁️ AWS Infrastructure via Terraform for complete functionality
